@@ -4,9 +4,12 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "jsx": "react",
+        "lib": [
+            "ES2021"
+        ],
         "noImplicitAny": false,
-        "sourceMap": true, 
-        "outDir":"./lib/"
+        "sourceMap": true,
+        "outDir": "./lib/"
     },
     "include": [
         "src/**/*"
