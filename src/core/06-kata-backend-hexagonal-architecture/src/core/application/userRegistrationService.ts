@@ -17,10 +17,10 @@ export class UserRegistrationService {
   }
 
   private async ensureThatUserDoesNotExists(registrationRequest: UserRegistrationRequest) {
-    const isUserFound = await this.userRepository.findByEmail(Email.create(registrationRequest.email));
-    if (isUserFound) {
+    const user = await this.userRepository.findByEmail(Email.create(registrationRequest.email));
+    user.tap(() => {
       throw new ValidationError('User already exists with this email');
-    }
+    });
   }
 
   private createUser(registrationRequest: UserRegistrationRequest) {

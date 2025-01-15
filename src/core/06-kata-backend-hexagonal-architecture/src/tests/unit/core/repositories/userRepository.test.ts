@@ -3,6 +3,7 @@ import { Email } from '../../../../core/valueObjects/email';
 import { Id } from '../../../../core/valueObjects/id';
 import { User } from '../../../../core/entities/user';
 import { InMemoryUserRepository } from '../../../../core/repositories/userRepository';
+import { Maybe } from '../../../../core/common/maybe';
 
 describe('The In Memory User Repository', () => {
   let repository: InMemoryUserRepository;
@@ -17,15 +18,17 @@ describe('The In Memory User Repository', () => {
     await repository.save(user);
 
     const foundUser = await repository.findById(id);
-
-    expect(foundUser).toEqual(user);
+    foundUser.fold(
+      () => fail('User not found'),
+      (u) => expect(u).toEqual(user)
+    );
   });
 
   it('does not find a non-existing user by ID ', async () => {
     const id = Id.generateUniqueIdentificer();
 
     const foundUser = await repository.findById(id);
-    expect(foundUser).toBeUndefined();
+    expect(foundUser).toEqual(Maybe.nothing());
   });
 
   it('finds a user by Email ', async () => {
@@ -34,8 +37,10 @@ describe('The In Memory User Repository', () => {
     await repository.save(user);
 
     const foundUser = await repository.findByEmail(email);
-
-    expect(foundUser).toEqual(user);
+    foundUser.fold(
+      () => fail('User not found'),
+      (u) => expect(u).toEqual(user)
+    );
   });
 
   it('does not find a non-existing user by Email ', async () => {
@@ -43,7 +48,7 @@ describe('The In Memory User Repository', () => {
 
     const foundUser = await repository.findByEmail(email);
 
-    expect(foundUser).toBeUndefined();
+    expect(foundUser).toEqual(Maybe.nothing());
   });
 
   it('finds all users', async () => {
@@ -65,18 +70,6 @@ describe('The In Memory User Repository', () => {
     expect(users).toHaveLength(0);
   });
 
-  it('removes and user', async () => {
-    const email = Email.create('test@example.com');
-    const user = createUserByEmail(email);
-    await repository.save(user);
-
-    await repository.remove(user);
-
-    const foundUser = await repository.findByEmail(email);
-
-    expect(foundUser).toBeUndefined();
-  });
-
   it('updates an user when its already exists', async () => {
     const user = createUserByEmail(Email.create('test@example.com'));
     const sameUser = user;
@@ -87,6 +80,18 @@ describe('The In Memory User Repository', () => {
 
     expect(users).toEqual([user]);
     expect(users).toHaveLength(1);
+  });
+
+  it('removes and user', async () => {
+    const email = Email.create('test@example.com');
+    const user = createUserByEmail(email);
+    await repository.save(user);
+
+    await repository.remove(user);
+
+    const foundUser = await repository.findByEmail(email);
+
+    expect(foundUser).toEqual(Maybe.nothing());
   });
 });
 

@@ -12,12 +12,18 @@ describe('The User Registration Service', () => {
     userRegistrationService = new UserRegistrationService(userRepository);
   });
 
-  it('register a new user successfuly when given registration request is valid', async () => {
+  it('register a new user successfully when given registration request is valid', async () => {
     await userRegistrationService.register(createRegistrationRequest());
 
     const expectedEmail = Email.create(createRegistrationRequest().email);
-    const foundUser = await userRepository.findByEmail(expectedEmail);
-    expect(foundUser.isMatchingEmail(expectedEmail)).toBe(true);
+    const storedUser = await userRepository.findByEmail(expectedEmail);
+
+    storedUser
+      .fold(
+        () => fail('User not found'),
+        (u) => expect(u.isMatchingEmail(expectedEmail))
+      )
+      .toBe(true);
   });
 
   it('does not allow to register an user when a one with the same email already exists', async () => {
