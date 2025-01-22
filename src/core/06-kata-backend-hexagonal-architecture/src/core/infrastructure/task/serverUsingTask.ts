@@ -1,8 +1,8 @@
+import { UserRegistrationControllerUsingTask } from './userRegistrationControllerUsingTask';
 import express, { Express, Request, Response, Router } from 'express';
-import { UserRegistrationController } from './userRegistrationController';
-import { Routes } from './routes';
+import { Routes } from '../routes';
 
-export function createRouter(userRegistrationController: UserRegistrationController) {
+export function createRouter(userRegistrationController: UserRegistrationControllerUsingTask) {
   const router = Router();
   router.get(Routes.status, (request: Request, response: Response) => response.status(200).json({ status: 'OK' }));
   router.post(Routes.register, userRegistrationController.register);

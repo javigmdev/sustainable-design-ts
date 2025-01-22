@@ -1,7 +1,7 @@
 import { User } from '../entities/user';
 import { Id } from '../valueObjects/id';
 import { Email } from '../valueObjects/email';
-import { Maybe } from '../common/maybe';
+import { Maybe } from '../common/monads/maybe';
 
 export interface UserRepository {
   findById(id: Id): Promise<Maybe<User>>;

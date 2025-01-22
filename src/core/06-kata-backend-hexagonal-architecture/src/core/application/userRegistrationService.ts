@@ -10,23 +10,18 @@ export class UserRegistrationService {
   constructor(private userRepository: UserRepository) {}
 
   async register(registrationRequest: UserRegistrationRequest): Promise<UserRegistrationResponse> {
-    await this.ensureThatUserDoesNotExists(registrationRequest);
-    const user = this.createUser(registrationRequest);
-    await this.userRepository.save(user);
-    return user.toDto();
-  }
-
-  private async ensureThatUserDoesNotExists(registrationRequest: UserRegistrationRequest) {
-    const user = await this.userRepository.findByEmail(Email.create(registrationRequest.email));
-    user.tap(() => {
+    const { email, password } = registrationRequest;
+    const maybeExistingUser = await this.userRepository.findByEmail(Email.create(registrationRequest.email));
+    maybeExistingUser.tap(() => {
       throw new ValidationError('User already exists with this email');
     });
-  }
 
-  private createUser(registrationRequest: UserRegistrationRequest) {
     const id = Id.generateUniqueIdentificer();
-    const email = Email.create(registrationRequest.email);
-    const password = Password.createFromPlainText(registrationRequest.password);
-    return new User(id, email, password);
+    const user = new User(id, Email.create(email), Password.createFromPlainText(password));
+    await this.userRepository.save(user);
+    return {
+      id: id.toString(),
+      email: email,
+    };
   }
 }

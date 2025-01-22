@@ -10,6 +10,10 @@ export class User {
     private password: Password
   ) {}
 
+  static fromDto(dto: { id: string; email: string; password: string }): User {
+    return new User(Id.createFrom(dto.id), Email.create(dto.email), Password.createFromHash(dto.password));
+  }
+
   changePassword(newPassword: Password) {
     this.ensureIsDifferentPassword(newPassword);
     this.password = newPassword;
@@ -41,6 +45,7 @@ export class User {
     return {
       id: this.id.toString(),
       email: this.email.toString(),
+      password: this.password.toString(),
     };
   }
 }

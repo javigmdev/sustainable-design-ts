@@ -1,4 +1,5 @@
 import { ValidationError } from '../common/validationError';
+import { Either } from '../common/monads/either';
 
 export class Email {
   private constructor(private address: string) {}
@@ -13,6 +14,10 @@ export class Email {
     if (!validEmailRegex.test(address)) {
       throw new ValidationError('Invalid email format');
     }
+  }
+
+  static createSafe(email: string): Either<ValidationError, Email> {
+    return Either.fromTry(() => Email.create(email));
   }
 
   toString() {
